@@ -22,9 +22,22 @@ public final class NotSolvedYet implements TestExecutionExceptionHandler {
     @Override
     public void handleTestExecutionException(ExtensionContext context, Throwable thrown) throws Throwable {
         boolean runningSolutions = Boolean.getBoolean("practice.solutions");
-        if (!runningSolutions && thrown instanceof UnsupportedOperationException && MESSAGE.equals(thrown.getMessage())) {
+        if (!runningSolutions && comesFromAStub(thrown)) {
             throw new TestAbortedException("not solved yet: write your solution, then run this test again");
         }
         throw thrown;
+    }
+
+    /**
+     * Checks the exception and its causes. A stub called inside {@code assertThrows} is reported
+     * by JUnit as an assertion failure whose <em>cause</em> is the stub's exception.
+     */
+    private static boolean comesFromAStub(Throwable thrown) {
+        for (Throwable t = thrown; t != null; t = t.getCause()) {
+            if (t instanceof UnsupportedOperationException && MESSAGE.equals(t.getMessage())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

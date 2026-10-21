@@ -17,3 +17,5 @@ jobs:
           cache: maven
       - name: Test the tests against the reference solutions
         run: ./mvnw -B verify -Psolutions
+      - name: Check that the unsolved stubs build and are reported as skipped
+        run: ./mvnw -B verify
